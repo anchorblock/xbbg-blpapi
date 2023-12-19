@@ -23,9 +23,9 @@ Below are main features. Jupyter notebook examples can be found [here](https://c
 
 - Bloomberg C++ SDK version 3.12.1 or higher:
 
-    - Visit [Bloomberg API Library](https://www.bloomberg.com/professional/support/api-library/) and download C++ Supported Release
+  - Visit [Bloomberg API Library](https://www.bloomberg.com/professional/support/api-library/) and download C++ Supported Release
 
-    - In the `bin` folder of downloaded zip file, copy `blpapi3_32.dll` and `blpapi3_64.dll` to Bloomberg `BLPAPI_ROOT` folder (usually `blp/DAPI`)
+  - In the `bin` folder of downloaded zip file, copy `blpapi3_32.dll` and `blpapi3_64.dll` to Bloomberg `BLPAPI_ROOT` folder (usually `blp/DAPI`)
 
 - Bloomberg official Python API:
 
@@ -68,12 +68,71 @@ _0.1.17_ - Add `adjust` argument in `bdh` for easier dividend / split adjustment
 ## Tutorial
 
 ```python
-In [1]: from xbbg import blp
+In [1]: from xbbg import blpapi
+```
+
+### Added Support APIs
+
+- `instruments` example:
+
+```python
+In [2]: all_instruments = blpapi.instruments('DHAKA',100)
+In [3]: all_instruments.head(5)
+```
+
+```pydocstring
+	Security	                Description
+0	SQUARE BD<equity>	        Square Pharmaceuticals PLC (Dhaka)
+1	GRAM BD<equity>	            GrameenPhone Ltd (Dhaka)
+2	BRAC BD<equity>	            BRAC Bank PLC (Dhaka)
+3	BXPHAR BD<equity>	        Beximco Pharmaceuticals Ltd (Dhaka)
+4	OLYMPI BD<equity>	        Olympic Industries Ltd (Dhaka)
+```
+
+- `government` example:
+
+```python
+In [2]: all_govList = blpapi.govList('BD',50)
+In [3]: all_govList.head(10)
+```
+
+```pydocstring
+
+ParseKey	        Name	                                    Ticker
+0	ZI862193 Corp	Sukuk Brunei Inc	                          BDSI
+1	ZI728007 Corp	Sukuk Brunei Inc	                          BDSI
+2	GG715431 Corp	Business Development Bank of Canada	         BDBCN
+3	ZJ058178 Corp	Sukuk Brunei Inc	                          BDSI
+4	ZI862194 Corp	Sukuk Brunei Inc	                          BDSI
+5	EG216635 Corp	Business Development Bank of Canada	          BDBCN
+6	3133XEXR Govt	FED HM LN BK BD	                              FHLB
+7	3133X8EW Govt	FED HM LN BK BD	                              FHLB
+8	ZL960404 Corp	Korea Treasury Bond	                          KTB
+9	3133XGAY Govt	FED HM LN BK BD	                              FHLB
+```
+
+- `curve` example:
+
+```python
+In [2]: all_curveList = blpapi.curveList('BD',5)
+In [3]: curveList.head(3)
+```
+
+```pydocstring
+
+	curve	            description	                     country	        currency	        curveid	        type	        subType
+0	YCCD0305 Index	Black & Decker Corp/The     	        US	            USD	                CD305		    CORP            CDS, SENIOR, CDS, SENIOR
+1	YCCD0306 Index	Brandywine Realty Trust     	        US	            USD	                CD306		    CORP            CDS, SENIOR, CDS, SENIOR
+2	YCCD0307 Index	Brandywine Operating Partnership LP	    US	            USD	                CD307		    CORP            CDS, SENIOR, CDS, SENIOR
 ```
 
 ### Basics
 
-- ``BDP`` example:
+```python
+In [1]: from xbbg import blp
+```
+
+- `BDP` example:
 
 ```python
 In [2]: blp.bdp(tickers='NVDA US Equity', flds=['Security_Name', 'GICS_Sector_Name'])
@@ -85,7 +144,7 @@ Out[2]:
 NVDA US Equity   NVIDIA Corp  Information Technology
 ```
 
-- ``BDP`` with overrides:
+- `BDP` with overrides:
 
 ```python
 In [3]: blp.bdp('AAPL US Equity', 'Eqy_Weighted_Avg_Px', VWAP_Dt='20181224')
@@ -97,7 +156,7 @@ Out[3]:
 AAPL US Equity               148.75
 ```
 
-- ``BDH`` example:
+- `BDH` example:
 
 ```python
 In [4]: blp.bdh(
@@ -120,7 +179,7 @@ Out[4]:
 2018-10-19  2,797.77 2,760.27   2,767.78
 ```
 
-- ``BDH`` example with Excel compatible inputs:
+- `BDH` example with Excel compatible inputs:
 
 ```python
 In [5]: blp.bdh(
@@ -140,7 +199,7 @@ Out[5]:
 2018-10-19     2,611.97 2,449.20   2,550.47
 ```
 
-- ``BDH`` without adjustment for dividends and splits:
+- `BDH` without adjustment for dividends and splits:
 
 ```python
 In [6]: blp.bdh(
@@ -159,7 +218,7 @@ Out[6]:
 2014-06-10          94.25
 ```
 
-- ``BDH`` adjusted for dividends and splits:
+- `BDH` adjusted for dividends and splits:
 
 ```python
 In [7]: blp.bdh(
@@ -178,7 +237,7 @@ Out[7]:
 2014-06-10          87.09
 ```
 
-- ``BDS`` example:
+- `BDS` example:
 
 ```python
 In [8]: blp.bds('AAPL US Equity', 'DVD_Hist_All', DVD_Start_Dt='20180101', DVD_End_Dt='20180531')
@@ -191,7 +250,7 @@ AAPL US Equity    2018-05-01  2018-05-11  2018-05-14   2018-05-17             0.
 AAPL US Equity    2018-02-01  2018-02-09  2018-02-12   2018-02-15             0.63            Quarter  Regular Cash
 ```
 
-- Intraday bars ``BDIB`` example:
+- Intraday bars `BDIB` example:
 
 ```python
 In [9]: blp.bdib(ticker='BHP AU Equity', dt='2018-10-17').tail()
@@ -213,7 +272,7 @@ Above example works because 1) `AU` in equity ticker is mapped to `EquityAustral
 To add new mappings, define `BBG_ROOT` in sys path and add `assets.yml` and
 `exch.yml` under `BBG_ROOT/markets`.
 
-*New in 0.6.6* - if exchange is defined in `/xbbg/markets/exch.yml`, can use `ref` to look for
+_New in 0.6.6_ - if exchange is defined in `/xbbg/markets/exch.yml`, can use `ref` to look for
 relevant exchange market hours. Both `ref='ES1 Index'` and `ref='CME'` work for this example:
 
 ```python
@@ -280,11 +339,11 @@ MS US Equity  2018-04-18  2018-04-27  2018-04-30  2018-05-15     0.25  Quarter  
 MS US Equity  2018-01-18  2018-01-30  2018-01-31  2018-02-15     0.25  Quarter  Regular Cash
 ```
 
------
+---
 
-*New in 0.1.17* - Dividend adjustment can be simplified to one parameter `adjust`:
+_New in 0.1.17_ - Dividend adjustment can be simplified to one parameter `adjust`:
 
-- ``BDH`` without adjustment for dividends and splits:
+- `BDH` without adjustment for dividends and splits:
 
 ```python
 In [14]: blp.bdh('AAPL US Equity', 'px_last', '20140606', '20140609', adjust='-')
@@ -298,7 +357,7 @@ Out[14]:
 2014-06-09          93.70
 ```
 
-- ``BDH`` adjusted for dividends and splits:
+- `BDH` adjusted for dividends and splits:
 
 ```python
 In [15]: blp.bdh('AAPL US Equity', 'px_last', '20140606', '20140609', adjust='all')
@@ -331,13 +390,13 @@ Noted that local data usage must be compliant with Bloomberg Datafeed Addendum
 
 [![Star History Chart](https://api.star-history.com/svg?repos=alpha-xone/xbbg&type=Date)](https://star-history.com/#alpha-xone/xbbg&Date)
 
-|                |                                                                                                                                                                                  |
-| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Docs           | [![Documentation Status](https://readthedocs.org/projects/xbbg/badge/?version=latest)](https://xbbg.readthedocs.io/)                                                             |
-| Build          | [![Actions Status](https://github.com/alpha-xone/xbbg/workflows/Auto%20CI/badge.svg)](https://github.com/alpha-xone/xbbg/actions)                                                |
-|                | [![Azure](https://dev.azure.com/alpha-xone/xbbg/_apis/build/status/alpha-xone.xbbg?branchName=main)](https://dev.azure.com/alpha-xone/xbbg/_build)                                               |
-| Coverage       | [![codecov](https://codecov.io/gh/alpha-xone/xbbg/branch/main/graph/badge.svg)](https://codecov.io/gh/alpha-xone/xbbg)                                                           |
-| Quality        | [![Codacy Badge](https://app.codacy.com/project/badge/Grade/daec9f52ba344e3ea116c15f1fc6d541)](https://www.codacy.com/gh/alpha-xone/xbbg/)                                       |
-|                | [![CodeFactor](https://www.codefactor.io/repository/github/alpha-xone/xbbg/badge)](https://www.codefactor.io/repository/github/alpha-xone/xbbg)                                  |
-|                | [![codebeat badge](https://codebeat.co/badges/eef1f14d-72eb-445a-af53-12d3565385ec)](https://codebeat.co/projects/github-com-alpha-xone-xbbg-main)                               |
-| License        | [![GitHub license](https://img.shields.io/github/license/alpha-xone/xbbg.svg)](https://github.com/alpha-xone/xbbg/blob/main/LICENSE)                                             |
+|          |                                                                                                                                                    |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Docs     | [![Documentation Status](https://readthedocs.org/projects/xbbg/badge/?version=latest)](https://xbbg.readthedocs.io/)                               |
+| Build    | [![Actions Status](https://github.com/alpha-xone/xbbg/workflows/Auto%20CI/badge.svg)](https://github.com/alpha-xone/xbbg/actions)                  |
+|          | [![Azure](https://dev.azure.com/alpha-xone/xbbg/_apis/build/status/alpha-xone.xbbg?branchName=main)](https://dev.azure.com/alpha-xone/xbbg/_build) |
+| Coverage | [![codecov](https://codecov.io/gh/alpha-xone/xbbg/branch/main/graph/badge.svg)](https://codecov.io/gh/alpha-xone/xbbg)                             |
+| Quality  | [![Codacy Badge](https://app.codacy.com/project/badge/Grade/daec9f52ba344e3ea116c15f1fc6d541)](https://www.codacy.com/gh/alpha-xone/xbbg/)         |
+|          | [![CodeFactor](https://www.codefactor.io/repository/github/alpha-xone/xbbg/badge)](https://www.codefactor.io/repository/github/alpha-xone/xbbg)    |
+|          | [![codebeat badge](https://codebeat.co/badges/eef1f14d-72eb-445a-af53-12d3565385ec)](https://codebeat.co/projects/github-com-alpha-xone-xbbg-main) |
+| License  | [![GitHub license](https://img.shields.io/github/license/alpha-xone/xbbg.svg)](https://github.com/alpha-xone/xbbg/blob/main/LICENSE)               |
